@@ -3,5 +3,5 @@
 import subprocess
 
 def main():
-    zfs_list = subprocess.run("zfs list", shell=True, stdout=subprocess.PIPE, text=True)
+    zfs_list = subprocess.run("zfs list -o name", shell=True, stdout=subprocess.PIPE, text=True)
     print(zfs_list.stdout) 
