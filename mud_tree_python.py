@@ -7,10 +7,17 @@ def main():
     try:
         datasets = subprocess.run("zfs list -H -o name", shell=True, stdout=subprocess.PIPE, text=True).stdout.splitlines()
         for dataset in datasets:
-            validate_dataset_name(dataset)
-        print(datasets)
+            print(str(Dataset(dataset)))
     except InvalidDatasetName as e:
         print("Exception:", str(e), file=sys.stderr)
+
+class Dataset:
+    def __init__(self, dataset_name):
+        validate_dataset_name(dataset_name)
+        self.name = dataset_name
+
+    def __str__(self):
+        return self.name
 
 import re
 
@@ -19,4 +26,4 @@ def validate_dataset_name(dataset_name):
         raise InvalidDatasetName(dataset_name)
 
 class InvalidDatasetName(Exception):
-   pass
+    pass
