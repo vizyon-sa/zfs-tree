@@ -26,4 +26,8 @@ def validate_dataset_name(dataset_name):
         raise InvalidDatasetName(dataset_name)
 
 class InvalidDatasetName(Exception):
-    pass
+    def __init__(self, invalid_dataset_name):
+        self.invalid_dataset_name = invalid_dataset_name
+
+    def __str__(self):
+        return f"{type(self).__name__}: {self.invalid_dataset_name}"
