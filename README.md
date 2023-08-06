@@ -1,4 +1,4 @@
-Tox utility to present ZFS datsets as a tree
+Toy utility to present ZFS datsets as a tree
 ============================================
 
 Development instructions:

@@ -14,3 +14,6 @@ dependencies = []
 
 [project.scripts]
 mud-tree-python = "mud_tree_python:main"
+
+[tool.flit.sdist]
+exclude = [".gitignore"]
