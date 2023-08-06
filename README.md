@@ -4,10 +4,13 @@ Toy utility to present ZFS datsets as a tree
 Development instructions:
 -------------------------
 
-First, set up a virtual environment, together with an installation of the flit
+First, use nox to lint the codebase:
+  - nox -s lint
+
+Then, set up a virtual environment, together with an installation of the flit
 build tool:
   - python -m venv venv
-  - source env/bin/activate.fish
+  - source venv/bin/activate.fish
   - pip install flit
 
 Then, proceed to building the package in the local virtual environment:
