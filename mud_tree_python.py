@@ -13,15 +13,19 @@ def main():
         child_hierarchy_roots = pset()
         for dataset in datasets:
             if dataset.origin() is None:
-                print(f"No   parent: {dataset}")
                 child_hierarchy_roots = child_hierarchy_roots.add(dataset)
             else:
-                print(f"With parent: {dataset}")
                 children = child_hierarchy.get(dataset.origin(), pset())
                 child_hierarchy = child_hierarchy.set(dataset.origin(), children.add(dataset))
-        print(f"{len(child_hierarchy_roots)} roots and {len(child_hierarchy)} entries.")
+        draw_trees(child_hierarchy_roots, child_hierarchy)
     except InvalidDatasetName as e:
         print("Exception:", str(e), file=sys.stderr)
+
+
+def draw_trees(roots, hierarchy, level=0):
+    for index, root in enumerate(roots):
+        print(f"{'  ' * (2 * level)}{root}")
+        draw_trees(hierarchy.get(root, pset()), hierarchy, level+1)
 
 
 def zfs_list():
@@ -31,8 +35,9 @@ def zfs_list():
 
 class Dataset:
     def __init__(self, dataset_name):
-        validate_dataset_name(dataset_name)
-        self.name = dataset_name
+        name = dataset_name.split('@', 1)[0]
+        validate_dataset_name(name)
+        self.name = name
 
     def origin(self):
         output = run(f"zfs get -H -o value origin {self.name}", shell=True, stdout=PIPE, text=True)
@@ -52,7 +57,7 @@ class Dataset:
 
 
 def validate_dataset_name(dataset_name):
-    if re.match(r'^[a-zA-Z0-9/_@]+$', dataset_name) is None:
+    if re.match(r'^[a-zA-Z0-9/_]+$', dataset_name) is None:
         raise InvalidDatasetName(dataset_name)
 
 
