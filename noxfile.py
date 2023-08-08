@@ -5,3 +5,9 @@ import nox
 def lint(session):
     session.install("flake8")
     session.run("flake8", "--exclude", ".nox")
+
+
+@nox.session
+def install(session):
+    session.install("flit")
+    session.run("flit", "install", "--symlink", "--deps", "production")
