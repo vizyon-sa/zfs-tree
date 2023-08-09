@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from rich.tree import Tree
+from rich import print
 from subprocess import run, PIPE
 import sys
 from pyrsistent import pset, pmap
@@ -17,15 +19,22 @@ def main():
             else:
                 children = child_hierarchy.get(dataset.origin(), pset())
                 child_hierarchy = child_hierarchy.set(dataset.origin(), children.add(dataset))
-        draw_trees(child_hierarchy_roots, child_hierarchy)
+        for tree in dataset_trees(child_hierarchy_roots, child_hierarchy):
+            print(tree)
     except InvalidDatasetName as e:
         print("Exception:", str(e), file=sys.stderr)
 
 
-def draw_trees(roots, hierarchy, level=0):
-    for index, root in enumerate(roots):
-        print(f"{'  ' * (2 * level)}{root}")
-        draw_trees(hierarchy.get(root, pset()), hierarchy, level+1)
+def dataset_trees(roots, hierarchy):
+    return [dataset_tree(root, hierarchy, Tree(str(root))) for root in roots]
+
+
+def dataset_tree(root, hierarchy, tree):
+    children = hierarchy.get(root, pset())
+    for child in children:
+        sub_tree = tree.add(str(child))
+        dataset_tree(child, hierarchy, sub_tree)
+    return tree
 
 
 def zfs_list():

@@ -10,7 +10,10 @@ authors = [{name = "Guillaume Yziquel", email = "guillaume@vizyon.ai"}]
 readme = "README.md"
 classifiers = ["Private :: Do Not Upload"]
 requires-python = ">=3.10"
-dependencies = ["pyrsistent ~=0.19.3"]
+dependencies = [
+  "rich >=13.5,<14",
+  "pyrsistent ~=0.19.3"
+]
 
 [project.scripts]
 mud-tree-python = "mud_tree_python:main"
