@@ -3,9 +3,9 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "mud_tree_python"
+name = "zfs_tree"
 version = "2023.0.0"
-description = "Toying around with drawing trees of zfs child datasets"
+description = "Listing ZFS datasets as a tree"
 authors = [{name = "Guillaume Yziquel", email = "guillaume@vizyon.ai"}]
 readme = "README.md"
 classifiers = ["Private :: Do Not Upload"]
@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mud-tree-python = "mud_tree_python:main"
+zfs-tree = "zfs_tree:main"
 
 [tool.flit.sdist]
 exclude = [".gitignore"]
