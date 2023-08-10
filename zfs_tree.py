@@ -26,20 +26,19 @@ def main():
 
 
 def dataset_trees(roots, hierarchy):
-    return [dataset_tree(root, hierarchy, Tree(str(root))) for root in roots]
+    return [dataset_tree(root, hierarchy, Tree(root.summary())) for root in roots]
 
 
 def dataset_tree(root, hierarchy, tree):
     children = hierarchy.get(root, pset())
     for child in children:
-        sub_tree = tree.add(str(child))
+        sub_tree = tree.add(child.summary())
         dataset_tree(child, hierarchy, sub_tree)
     return tree
 
 
 def zfs_list():
-    output = run("zfs list -H -o name", shell=True, stdout=PIPE, text=True)
-    return output.stdout.splitlines()
+    return command("zfs list -H -o name").splitlines()
 
 
 class Dataset:
@@ -49,11 +48,18 @@ class Dataset:
         self.name = name
 
     def origin(self):
-        output = run(f"zfs get -H -o value origin {self.name}", shell=True, stdout=PIPE, text=True)
-        if output.stdout.rstrip() != "-":
-            return Dataset(output.stdout.rstrip())
+        origin = command(f"zfs get -H -o value origin {self.name}")
+        if origin != "-":
+            return Dataset(origin)
         else:
             return None
+
+    def summary(self):
+        return f"{str(self)} → {self.mountpoint()}"
+
+    def mountpoint(self):
+        return command(f"zfs get -H -o value mountpoint {self.name}")
+
 
     def __str__(self):
         return self.name
@@ -63,6 +69,10 @@ class Dataset:
 
     def __eq__(self, other):
         return isinstance(other, Dataset) and self.name == other.name
+
+
+def command(cmd):
+    return run(cmd, shell = True, stdout = PIPE, text = True).stdout.rstrip()
 
 
 def validate_dataset_name(dataset_name):
