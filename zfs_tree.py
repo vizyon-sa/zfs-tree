@@ -48,18 +48,27 @@ class Dataset:
         self.name = name
 
     def origin(self):
-        origin = command(f"zfs get -H -o value origin {self.name}")
+        origin = self.zfs_get("origin")
         if origin != "-":
             return Dataset(origin)
         else:
             return None
 
     def summary(self):
-        return f"{str(self)} → {self.mountpoint()}"
+        if self.mounted():
+            mount_info = f" → {self.mountpoint()}"
+        else:
+            mount_info = ''
+        return f"{str(self)}{mount_info}"
+
+    def mounted(self):
+        return boolean(self.zfs_get("mounted"))
 
     def mountpoint(self):
-        return command(f"zfs get -H -o value mountpoint {self.name}")
+        return self.zfs_get("mountpoint")
 
+    def zfs_get(self, property):
+        return command(f"zfs get -H -o value {property} {self.name}")
 
     def __str__(self):
         return self.name
@@ -70,6 +79,13 @@ class Dataset:
     def __eq__(self, other):
         return isinstance(other, Dataset) and self.name == other.name
 
+def boolean(string):
+    if string == "yes":
+        return True
+    elif string in ["no", "-"]:
+        return False
+    else:
+        raise ValueError(f"The string \"{string}\" is neither \"yes\" nor \"no\" and can thus not be converted into neither True nor False.")
 
 def command(cmd):
     return run(cmd, shell = True, stdout = PIPE, text = True).stdout.rstrip()
