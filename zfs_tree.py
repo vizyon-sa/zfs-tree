@@ -10,31 +10,32 @@ import re
 
 def main():
     try:
-        datasets = [Dataset(dataset_name) for dataset_name in zfs_list()]
-        child_hierarchy = pmap()
-        child_hierarchy_roots = pset()
-        for dataset in datasets:
-            if dataset.origin() is None:
-                child_hierarchy_roots = child_hierarchy_roots.add(dataset)
-            else:
-                children = child_hierarchy.get(dataset.origin(), pset())
-                child_hierarchy = child_hierarchy.set(dataset.origin(), children.add(dataset))
-        for tree in dataset_trees(child_hierarchy_roots, child_hierarchy):
+        hierarchy = Hierarchy([Dataset(dataset_name) for dataset_name in zfs_list()])
+        for tree in hierarchy.trees():
             print(tree)
     except InvalidDatasetName as e:
         print("Exception:", str(e), file=sys.stderr)
 
 
-def dataset_trees(roots, hierarchy):
-    return [dataset_tree(root, hierarchy, Tree(root.summary())) for root in roots]
+class Hierarchy:
+    def __init__(self, datasets):
+        clone_relation = pmap()
+        roots = pset()
+        for dataset in datasets:
+            if dataset.origin() is None:
+                roots = roots.add(dataset)
+            else:
+                clones = clone_relation.get(dataset.origin(), pset())
+                clone_relation = clone_relation.set(dataset.origin(), clones.add(dataset))
+        self.clone_relation = clone_relation
+        self.roots = roots
 
-
-def dataset_tree(root, hierarchy, tree):
-    children = hierarchy.get(root, pset())
-    for child in children:
-        sub_tree = tree.add(child.summary())
-        dataset_tree(child, hierarchy, sub_tree)
-    return tree
+    def trees(self):
+        def tree(root, partial_tree):
+            for clone in self.clone_relation.get(root, pset()):
+                tree(clone, partial_tree.add(clone.summary()))
+            return partial_tree
+        return [tree(root, Tree(root.summary())) for root in self.roots]
 
 
 def zfs_list():
