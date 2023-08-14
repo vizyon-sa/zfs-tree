@@ -22,11 +22,11 @@ class Hierarchy:
         clone_relation = pmap()
         roots = pset()
         for dataset in datasets:
-            if dataset.origin() is None:
-                roots = roots.add(dataset)
-            else:
+            if dataset.origin() is not None:
                 clones = clone_relation.get(dataset.origin(), pset())
                 clone_relation = clone_relation.set(dataset.origin(), clones.add(dataset))
+            else:
+                roots = roots.add(dataset)
         self.clone_relation = clone_relation
         self.roots = roots
 
