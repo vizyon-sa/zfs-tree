@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from rich.tree import Tree
-from rich import print
+from rich.console import Console
 from subprocess import run, PIPE
 import sys
 from pyrsistent import pset, pmap
@@ -9,12 +9,13 @@ import re
 
 
 def main():
+    console = Console()
     try:
         hierarchy = Hierarchy([Dataset(dataset_name) for dataset_name in zfs_list()])
         for tree in hierarchy.trees():
-            print(tree)
+            console.print(tree)
     except InvalidDatasetName as e:
-        print("Exception:", str(e), file=sys.stderr)
+        console.print("Exception:", str(e), file=sys.stderr)
 
 
 class Hierarchy:
@@ -37,8 +38,11 @@ class Hierarchy:
 
     def trees(self):
         def tree(root, partial_tree):
-            for clone in self.clone_relation.get(root, pset()):
-                tree(clone, partial_tree.add(clone.summary()))
+            if len(self.clone_relation.get(root, pset())) != 0:
+                def clone_tree(clone_root, partial_tree):
+                    for clone in self.clone_relation.get(clone_root, pset()):
+                        clone_tree(clone, partial_tree.add(clone.summary(), guide_style = "dim"))
+                clone_tree(root, partial_tree.add("CLONES:", guide_style = "dim"))
             for child in self.child_relation.get(root, pset()):
                 tree(child, partial_tree.add(child.summary()))
             return partial_tree
