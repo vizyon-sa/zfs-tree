@@ -40,7 +40,7 @@ class Hierarchy:
             for clone in self.clone_relation.get(root, pset()):
                 tree(clone, partial_tree.add(clone.summary()))
             for child in self.child_relation.get(root, pset()):
-                tree(clone, partial_tree.add(child.summary()))
+                tree(child, partial_tree.add(child.summary()))
             return partial_tree
         return [tree(root, Tree(root.summary())) for root in self.roots]
 
@@ -63,7 +63,11 @@ class Dataset:
             return None
 
     def parent(self):
-        return None
+        segments = self.name.rsplit("/", 1)
+        if len(segments) < 2:
+            return None
+        else:
+            return Dataset(segments[0])
 
     def summary(self):
         if self.mounted():
