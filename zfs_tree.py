@@ -20,20 +20,27 @@ def main():
 class Hierarchy:
     def __init__(self, datasets):
         clone_relation = pmap()
+        child_relation = pmap()
         roots = pset()
         for dataset in datasets:
             if dataset.origin() is not None:
                 clones = clone_relation.get(dataset.origin(), pset())
                 clone_relation = clone_relation.set(dataset.origin(), clones.add(dataset))
+            elif dataset.parent() is not None:
+                children = child_relation.get(dataset.parent(), pset())
+                child_relation = child_relation.set(dataset.parent(), children.add(dataset))
             else:
                 roots = roots.add(dataset)
         self.clone_relation = clone_relation
+        self.child_relation = child_relation
         self.roots = roots
 
     def trees(self):
         def tree(root, partial_tree):
             for clone in self.clone_relation.get(root, pset()):
                 tree(clone, partial_tree.add(clone.summary()))
+            for child in self.child_relation.get(root, pset()):
+                tree(clone, partial_tree.add(child.summary()))
             return partial_tree
         return [tree(root, Tree(root.summary())) for root in self.roots]
 
@@ -54,6 +61,9 @@ class Dataset:
             return Dataset(origin)
         else:
             return None
+
+    def parent(self):
+        return None
 
     def summary(self):
         if self.mounted():
