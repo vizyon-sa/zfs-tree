@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from rich.tree import Tree
+from rich.panel import Panel
 from rich.console import Console
 from subprocess import run, PIPE
 import sys
@@ -36,17 +37,24 @@ class Hierarchy:
         self.child_relation = child_relation
         self.roots = roots
 
+    def is_cloned(self, dataset):
+        return (len(self.clone_relation.get(dataset, pset())) != 0)
+
     def trees(self):
-        def tree(root, partial_tree):
-            if len(self.clone_relation.get(root, pset())) != 0:
-                def clone_tree(clone_root, partial_tree):
-                    for clone in self.clone_relation.get(clone_root, pset()):
-                        clone_tree(clone, partial_tree.add(clone.summary(), guide_style = "dim"))
-                clone_tree(root, partial_tree.add("CLONES:", guide_style = "dim"))
-            for child in self.child_relation.get(root, pset()):
-                tree(child, partial_tree.add(child.summary()))
+        def clone_tree(dataset, partial_tree):
+            for clone in self.clone_relation.get(dataset, pset()):
+                clone_tree(clone, partial_tree.add(clone.summary(), guide_style = "dim"))
             return partial_tree
-        return [tree(root, Tree(root.summary())) for root in self.roots]
+        def with_clones(dataset):
+            if self.is_cloned(dataset):
+                return Panel.fit(clone_tree(dataset, Tree(dataset.summary(), guide_style = "dim")))
+            else:
+                return dataset.summary()
+        def tree(root, partial_tree):
+            for child in self.child_relation.get(root, pset()):
+                tree(child, partial_tree.add(with_clones(child)))
+            return partial_tree
+        return [tree(root, Tree(with_clones(root))) for root in self.roots]
 
 
 def zfs_list():
