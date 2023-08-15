@@ -47,7 +47,7 @@ class Hierarchy:
             return partial_tree
         def with_clones(dataset):
             if self.is_cloned(dataset):
-                return Panel.fit(clone_tree(dataset, Tree(dataset.summary(), guide_style = "dim")))
+                return Panel.fit(clone_tree(dataset, Tree(dataset.summary(), guide_style = "dim")), style = "dim")
             else:
                 return dataset.summary()
         def tree(root, partial_tree):
