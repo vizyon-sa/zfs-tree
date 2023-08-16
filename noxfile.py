@@ -2,6 +2,13 @@ import nox
 
 
 @nox.session
+def format(session):
+    session.install("black")
+    source_dirs = ["src"]
+    session.run("black", *source_dirs)
+
+
+@nox.session
 def lint(session):
     session.install("flake8")
     session.run("flake8", "--exclude", ".nox")

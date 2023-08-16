@@ -27,10 +27,14 @@ class Hierarchy:
         for dataset in datasets:
             if dataset.origin() is not None:
                 clones = clone_relation.get(dataset.origin(), pset())
-                clone_relation = clone_relation.set(dataset.origin(), clones.add(dataset))
+                clone_relation = clone_relation.set(
+                    dataset.origin(), clones.add(dataset)
+                )
             elif dataset.parent() is not None:
                 children = child_relation.get(dataset.parent(), pset())
-                child_relation = child_relation.set(dataset.parent(), children.add(dataset))
+                child_relation = child_relation.set(
+                    dataset.parent(), children.add(dataset)
+                )
             else:
                 roots = roots.add(dataset)
         self.clone_relation = clone_relation
@@ -38,22 +42,28 @@ class Hierarchy:
         self.roots = roots
 
     def is_cloned(self, dataset):
-        return (len(self.clone_relation.get(dataset, pset())) != 0)
+        return len(self.clone_relation.get(dataset, pset())) != 0
 
     def trees(self):
         def clone_tree(dataset, partial_tree):
             for clone in self.clone_relation.get(dataset, pset()):
-                clone_tree(clone, partial_tree.add(clone.summary(), guide_style = "dim"))
+                clone_tree(clone, partial_tree.add(clone.summary(), guide_style="dim"))
             return partial_tree
+
         def with_clones(dataset):
             if self.is_cloned(dataset):
-                return Panel.fit(clone_tree(dataset, Tree(dataset.summary(), guide_style = "dim")), style = "dim")
+                return Panel.fit(
+                    clone_tree(dataset, Tree(dataset.summary(), guide_style="dim")),
+                    style="dim",
+                )
             else:
                 return dataset.summary()
+
         def tree(root, partial_tree):
             for child in self.child_relation.get(root, pset()):
                 tree(child, partial_tree.add(with_clones(child)))
             return partial_tree
+
         return [tree(root, Tree(with_clones(root))) for root in self.roots]
 
 
@@ -63,7 +73,7 @@ def zfs_list():
 
 class Dataset:
     def __init__(self, dataset_name):
-        name = dataset_name.split('@', 1)[0]
+        name = dataset_name.split("@", 1)[0]
         validate_dataset_name(name)
         self.name = name
 
@@ -85,7 +95,7 @@ class Dataset:
         if self.mounted():
             mount_info = f" → {self.mountpoint()}"
         else:
-            mount_info = ''
+            mount_info = ""
         return f"{str(self)}{mount_info}"
 
     def mounted(self):
@@ -106,20 +116,24 @@ class Dataset:
     def __eq__(self, other):
         return isinstance(other, Dataset) and self.name == other.name
 
+
 def boolean(string):
     if string == "yes":
         return True
     elif string in ["no", "-"]:
         return False
     else:
-        raise ValueError(f"The string \"{string}\" is neither \"yes\" nor \"no\" and can thus not be converted into neither True nor False.")
+        raise ValueError(
+            f'The string "{string}" is neither "yes" nor "no" and can thus not be converted into neither True nor False.'
+        )
+
 
 def command(cmd):
-    return run(cmd, shell = True, stdout = PIPE, text = True).stdout.rstrip()
+    return run(cmd, shell=True, stdout=PIPE, text=True).stdout.rstrip()
 
 
 def validate_dataset_name(dataset_name):
-    if re.match(r'^[a-zA-Z0-9/_]+$', dataset_name) is None:
+    if re.match(r"^[a-zA-Z0-9/_]+$", dataset_name) is None:
         raise InvalidDatasetName(dataset_name)
 
 
