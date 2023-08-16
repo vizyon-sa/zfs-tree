@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from rich.tree import Tree
 from rich.panel import Panel
 from rich.console import Console
