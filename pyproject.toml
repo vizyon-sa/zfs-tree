@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "zfs_tree"
-version = "2023.0.0"
+version = "0.1.dev"
 description = "Listing ZFS datasets as a tree"
 authors = [{name = "Guillaume Yziquel", email = "guillaume@vizyon.ai"}]
 readme = "README.md"
