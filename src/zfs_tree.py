@@ -131,7 +131,7 @@ def command(cmd):
 
 
 def validate_dataset_name(dataset_name):
-    if re.match(r"^[a-zA-Z0-9/_]+$", dataset_name) is None:
+    if re.match(r"^[a-zA-Z0-9/\-_\.]+$", dataset_name) is None:
         raise InvalidDatasetName(dataset_name)
 
 
