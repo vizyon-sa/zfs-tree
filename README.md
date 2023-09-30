@@ -11,5 +11,5 @@ Running `flit install` will install an executable available on the command
 line.
 
 The generated executable will list the zfs datasets hierarchically in a
-parent/child dependency tree and will single out snapshots in box nested in
+parent/child dependency tree and will single out snapshots in boxes nested in
 the tree structure.
