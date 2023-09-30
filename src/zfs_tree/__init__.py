@@ -17,6 +17,8 @@ def main():
 
 
 def zfs_list():
+    # For documention of the `zfs list` command, see:
+    # https://docs.oracle.com/cd/E18752_01/html/819-5461/gazsu.html
     return command("zfs list -H -o name").splitlines()
 
 
