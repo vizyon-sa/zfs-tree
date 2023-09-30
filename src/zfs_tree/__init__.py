@@ -122,7 +122,7 @@ def boolean(string):
         return False
     else:
         raise ValueError(
-            f"The string \"{string}\" is neither \"yes\" nor \"no\" and can "
+            f'The string "{string}" is neither "yes" nor "no" and can '
             "thus not be converted into neither True nor False."
         )
 
