@@ -17,8 +17,16 @@ def main():
 
 
 def zfs_list():
+    #
+    # Some details about the `zfs list` invocation below:
+    #
+    # The `-H` option removes the headers from the `zfs list` command, making
+    # it more amenable to command line output parsing with the `.splitlines()`
+    # method.
+    #
     # For documention of the `zfs list` command, see:
     # https://docs.oracle.com/cd/E18752_01/html/819-5461/gazsu.html
+    #
     return command("zfs list -H -o name").splitlines()
 
 
@@ -43,11 +51,15 @@ class Dataset:
             return Dataset(segments[0])
 
     def summary(self):
+        size_info = f" [{self.size()}]"
         if self.mounted():
             mount_info = f" → {self.mountpoint()}"
         else:
             mount_info = ""
-        return f"{str(self)}{mount_info}"
+        return f"{str(self)}{size_info}{mount_info}"
+
+    def size(self):
+        return command(f"zfs list -H -o used {self.name}")
 
     def mounted(self):
         return boolean(self.zfs_get("mounted"))
