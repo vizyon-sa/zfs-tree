@@ -26,7 +26,7 @@ class Dataset:
     def summary(self):
         size_info = f" [{self.size()}]"
         if self.mounted():
-            mount_info = f" → {self.mountpoint()}"
+            mount_info = f" → {self.mountpoints()}"
         else:
             mount_info = ""
         return f"{str(self)}{size_info}{mount_info}"
@@ -37,11 +37,16 @@ class Dataset:
     def mounted(self):
         return boolean(self.zfs_get("mounted"))
 
-    def mountpoint(self):
-        return self.zfs_get("mountpoint")
+    def mountpoints(self):
+        return ", ".join(self.findmnt())
 
     def zfs_get(self, property):
         return command(f"zfs get -H -o value {property} {self.name}")
+
+    def findmnt(self):
+        return command(
+            f"findmnt --noheadings --output TARGET --source {self.name}"
+        ).splitlines()
 
     def __str__(self):
         return self.name
