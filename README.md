@@ -10,7 +10,7 @@ Running `nox` will build the codebase and provide an executable in
 Installation instructions:
 --------------------------
 
-Running `flit install` will install an executable available on the command
+Running `flit install` will install an executable available from the command
 line.
 
 Usage instructions:
