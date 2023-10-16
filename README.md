@@ -49,3 +49,30 @@ aggr0 [1.97T] → /aggr0
 ├── aggr0/webstats [61.4G] → /aggr0/webstats
 └── aggr0/vol1 [323G] → /aggr0/vol1
 ```
+
+In the presence of snapshots, one get the following kind of output:
+
+```console
+├── rpool/lxd/deleted [564M]
+│   ├── rpool/lxd/deleted/images [564M]
+│   │   ├── ╭────────────────────────────────────────────────────────────────╮
+│   │   │   │ rpool/lxd/deleted/images/3ffdb1....a05cb130bcb312.block [563M] │
+│   │   │   │ └── rpool/lxd/virtual-machines/opencog.block [3.12G]           │
+│   │   │   ╰────────────────────────────────────────────────────────────────╯
+│   │   └── ╭────────────────────────────────────────────────────────────────╮
+│   │       │ rpool/lxd/deleted/images/3ffdb12efa6a....05cb1330bcb312 [220K] │
+│   │       │ └── rpool/lxd/virtual-machines/opencog [8.02M]                 │
+│   │       ╰────────────────────────────────────────────────────────────────╯
+│   ├── rpool/lxd/deleted/virtual-machines [192K]
+│   ├── rpool/lxd/deleted/buckets [192K]
+│   ├── rpool/lxd/deleted/custom [192K]
+│   └── rpool/lxd/deleted/containers [192K]
+```
+
+If, for instance, (which is a situation that motivated the development of this
+tool), you install a fresh ubuntu with a zfs filesystem on the root drive, and
+if you subsequently install docker, you may run into weird issues of leftover
+zfs snapshots that are a major pain to clean up. The zfs datasets that should
+be cleaned up will appear in boxes, as above, which will ease the
+identification of the zfs datasets to remove in that painstaking cleanup
+process.
